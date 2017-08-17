@@ -1,0 +1,15 @@
+CPP = g++
+CPPFLAGS = -g -DUSE_LINUX -Wall -Wno-deprecated -pthread
+
+LIB_DIR = ../../../lib
+INC_DIR = -I/home/robot/src/Dragonfly_Message_defs -I../../../include
+TM_DIR = .
+
+Executive: ${TM_DIR}/Executive.cpp
+	${CPP} ${CPPFLAGS} -L${LIB_DIR} ${INC_DIR} -o ${TM_DIR}/Executive ${TM_DIR}/Executive.cpp -lDragonfly
+
+all: Consumer
+
+clean:
+	rm -f ${TM_DIR}/Executive
+
