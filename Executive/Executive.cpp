@@ -15,7 +15,8 @@ int main( int argc, char *argv[])
 		mod.Subscribe( MT_RT_POSITION_FEEDBACK);
 		mod.Subscribe( MT_TASK_STATE_CONFIG);
 		
-		// TODO -- here is where one should read from the .config file and send out the next specifications for the next trial instead randomly selecting
+		// TODO -- here is where one should read from the .config file and send out the next 
+    // specifications for the next trial instead randomly selecting
 		
 		MDF_TRIAL_INPUT trial_input_data;
 		double targetPositions [4] = {0.10, 0.15, 0.20};
@@ -35,22 +36,28 @@ int main( int argc, char *argv[])
 		CMessage trial_input_M( MT_TRIAL_INPUT);
 		trial_input_M.SetData( &trial_input_data, sizeof(trial_input_data));
 		mod.SendMessageDF( &trial_input_M);
-		cout << "XorYorZ " << trial_input_data.XorYorZ << endl << "force threshold " << trial_input_data.forceThreshold  << endl << "target distance " << trial_input_data.targetDistance << endl << "UpOrDown " << trial_input_data.UpOrDown << endl;
+    
+		cout << "XorYorZ " << trial_input_data.XorYorZ << endl << "force threshold " << 
+      trial_input_data.forceThreshold  << endl << "target distance " << 
+      trial_input_data.targetDistance << endl << "UpOrDown " << 
+      trial_input_data.UpOrDown << endl;
 		cout << "Sent out data" << endl;
 		
         std::cout << "Consumer running...\n" << std::endl;
         
 		while( 1) 
 		{
-            CMessage M;
+      CMessage M;
 			mod.ReadMessage( &M);
 			//std::cout << "Received message " << M.msg_type << std::endl;
             
-			switch( M.msg_type) {
+			switch( M.msg_type)
+      {
 				case MT_TASK_STATE_CONFIG:
 					MDF_TASK_STATE_CONFIG task_state_data;
 					M.GetData( &task_state_data);
-					if(strcmp(task_state_data.fdbk_display_color, "yellow") == 0){
+					if(strcmp(task_state_data.fdbk_display_color, "yellow") == 0)
+          {
 						// populate messages
 						// TODO read from config file to populate messages
 						trial_input_data.XorYorZ = directions[rand() % 2];
@@ -59,7 +66,10 @@ int main( int argc, char *argv[])
 						trial_input_data.UpOrDown = UpOrDownDirs[rand() % 2];
 						trial_input_data.targetError = 0.03;
 						
-						cout << "XorYorZ " << trial_input_data.XorYorZ << endl << "force threshold " << trial_input_data.forceThreshold  << endl << "target distance " << trial_input_data.targetDistance << endl << "UpOrDown " << trial_input_data.UpOrDown << endl;
+						cout << "XorYorZ " << trial_input_data.XorYorZ << endl << "force threshold " 
+              << trial_input_data.forceThreshold  << endl << "target distance " 
+              << trial_input_data.targetDistance << endl << "UpOrDown " 
+              << trial_input_data.UpOrDown << endl;
 						cout << "Sent out data" << endl;
 						
 						MDF_TASK_STATE_CONFIG task_state_data;

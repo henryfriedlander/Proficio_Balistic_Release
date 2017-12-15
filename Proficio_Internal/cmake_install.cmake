@@ -1,4 +1,4 @@
-# Install script for directory: /home/robot/src/Proficio_Internal
+# Install script for directory: /home/robot/Proficio_Balistic_Release/Proficio_Internal
 
 # Set the install prefix
 IF(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -33,27 +33,27 @@ IF(NOT DEFINED CMAKE_INSTALL_SO_NO_EXE)
 ENDIF(NOT DEFINED CMAKE_INSTALL_SO_NO_EXE)
 
 IF(NOT CMAKE_INSTALL_COMPONENT OR "${CMAKE_INSTALL_COMPONENT}" STREQUAL "Unspecified")
-  IF(EXISTS "$ENV{DESTDIR}/home/robot/src/Proficio_Internal/proficio_internal_2dBalistic" AND
-     NOT IS_SYMLINK "$ENV{DESTDIR}/home/robot/src/Proficio_Internal/proficio_internal_2dBalistic")
+  IF(EXISTS "$ENV{DESTDIR}/home/robot/Proficio_Balistic_Release/Proficio_Internal/proficio_internal_2dBalistic" AND
+     NOT IS_SYMLINK "$ENV{DESTDIR}/home/robot/Proficio_Balistic_Release/Proficio_Internal/proficio_internal_2dBalistic")
     FILE(RPATH_CHECK
-         FILE "$ENV{DESTDIR}/home/robot/src/Proficio_Internal/proficio_internal_2dBalistic"
+         FILE "$ENV{DESTDIR}/home/robot/Proficio_Balistic_Release/Proficio_Internal/proficio_internal_2dBalistic"
          RPATH "")
   ENDIF()
   list(APPEND CPACK_ABSOLUTE_DESTINATION_FILES
-   "/home/robot/src/Proficio_Internal/proficio_internal_2dBalistic")
-FILE(INSTALL DESTINATION "/home/robot/src/Proficio_Internal" TYPE EXECUTABLE FILES "/home/robot/src/Proficio_Internal/proficio_internal_2dBalistic")
-  IF(EXISTS "$ENV{DESTDIR}/home/robot/src/Proficio_Internal/proficio_internal_2dBalistic" AND
-     NOT IS_SYMLINK "$ENV{DESTDIR}/home/robot/src/Proficio_Internal/proficio_internal_2dBalistic")
+   "/home/robot/Proficio_Balistic_Release/Proficio_Internal/proficio_internal_2dBalistic")
+FILE(INSTALL DESTINATION "/home/robot/Proficio_Balistic_Release/Proficio_Internal" TYPE EXECUTABLE FILES "/home/robot/Proficio_Balistic_Release/Proficio_Internal/proficio_internal_2dBalistic")
+  IF(EXISTS "$ENV{DESTDIR}/home/robot/Proficio_Balistic_Release/Proficio_Internal/proficio_internal_2dBalistic" AND
+     NOT IS_SYMLINK "$ENV{DESTDIR}/home/robot/Proficio_Balistic_Release/Proficio_Internal/proficio_internal_2dBalistic")
     FILE(RPATH_REMOVE
-         FILE "$ENV{DESTDIR}/home/robot/src/Proficio_Internal/proficio_internal_2dBalistic")
+         FILE "$ENV{DESTDIR}/home/robot/Proficio_Balistic_Release/Proficio_Internal/proficio_internal_2dBalistic")
     IF(CMAKE_INSTALL_DO_STRIP)
-      EXECUTE_PROCESS(COMMAND "/usr/bin/strip" "$ENV{DESTDIR}/home/robot/src/Proficio_Internal/proficio_internal_2dBalistic")
+      EXECUTE_PROCESS(COMMAND "/usr/bin/strip" "$ENV{DESTDIR}/home/robot/Proficio_Balistic_Release/Proficio_Internal/proficio_internal_2dBalistic")
     ENDIF(CMAKE_INSTALL_DO_STRIP)
   ENDIF()
 ENDIF(NOT CMAKE_INSTALL_COMPONENT OR "${CMAKE_INSTALL_COMPONENT}" STREQUAL "Unspecified")
 
 IF(NOT CMAKE_INSTALL_COMPONENT OR "${CMAKE_INSTALL_COMPONENT}" STREQUAL "Unspecified")
-  execute_process(COMMAND chown -R : /home/robot/src/Proficio_Internal)
+  execute_process(COMMAND chown -R : /home/robot/Proficio_Balistic_Release/Proficio_Internal)
 ENDIF(NOT CMAKE_INSTALL_COMPONENT OR "${CMAKE_INSTALL_COMPONENT}" STREQUAL "Unspecified")
 
 IF(CMAKE_INSTALL_COMPONENT)
@@ -62,7 +62,7 @@ ELSE(CMAKE_INSTALL_COMPONENT)
   SET(CMAKE_INSTALL_MANIFEST "install_manifest.txt")
 ENDIF(CMAKE_INSTALL_COMPONENT)
 
-FILE(WRITE "/home/robot/src/Proficio_Internal/${CMAKE_INSTALL_MANIFEST}" "")
+FILE(WRITE "/home/robot/Proficio_Balistic_Release/Proficio_Internal/${CMAKE_INSTALL_MANIFEST}" "")
 FOREACH(file ${CMAKE_INSTALL_MANIFEST_FILES})
-  FILE(APPEND "/home/robot/src/Proficio_Internal/${CMAKE_INSTALL_MANIFEST}" "${file}\n")
+  FILE(APPEND "/home/robot/Proficio_Balistic_Release/Proficio_Internal/${CMAKE_INSTALL_MANIFEST}" "${file}\n")
 ENDFOREACH(file)
