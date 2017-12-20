@@ -393,10 +393,10 @@ MDF_CHANGE_TOOL_COMPLETE._fields_ = [
 class MDF_BURT_STATUS(Structure):
     pass
 MDF_BURT_STATUS._fields_ = [
-    ('error', c_int),
-    ('error_mdg', c_int),
-    ('task_complete', c_int),
-    ('task_success', c_int),
+    ('error', c_bool),
+    ('error_msg', c_char * 64),
+    ('task_complete', c_bool),
+    ('task_success', c_bool),
     ('timestamp', c_double),
     ('user_force', c_double),
     ('pos_x', c_double),
