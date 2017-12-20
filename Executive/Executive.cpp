@@ -2,16 +2,19 @@
 #include "Dragonfly.h"
 #include "Dragonfly_config.h"
 #include "params.h"
+#include <vector>
+using namespace std;
 
 class TargetNode
 {
-  int  distance;
-  int direction;
-  int     width;
-  double  force;
 
   public:
-    TargetNode(int dist, int dir, int wid, double frc)
+    int  distance; //preferred is probably public getters and setters...
+    int direction;
+    int     width;
+    double  force;
+
+    TargetNode(double dist, int dir, int wid, double frc)
     {
       distance = dist;
       direction = dir;
@@ -22,24 +25,28 @@ class TargetNode
 
 vector<TargetNode> initTargetList( 
   vector<int> dirs,
-  vector<int> forces,
+  vector<double> forces,
   vector<int> widths,
   vector<double> distances)
 {
   // assert widths/distances are the same length
   if (distances.size() != widths.size())
   {
-    throw Exception("Yaml error, widths and distances must have same length");
+    throw "Yaml error, widths and distances must have same length";
   }
   vector<TargetNode> targetList;
 
-  for (Iter forIt = forces.begin(); forIt!=forces.end(); ++forIt)
+  for (int k = 0; k < forces.size(); k++)
   {
-    for (Iter dirIt = dirs.begin(); dirIt!=dirs.end(); ++dirIt)
+    for (int j = 0; j < dirs.size(); j++)
     {
       for (int i = 0; i < distances.size(); i++)
       {
-        TargetNode node = TargetNode(distances.begin()+i, *dirIt, widths.begin()+i, *forIt);
+        double newDist = distances.at(i);
+        int newDir = dirs.at(j);
+        int newWid = widths.at(i);
+        double newForce = forces.at(k);
+        TargetNode node = TargetNode(newDist, newDir, newWid, newForce);
         targetList.push_back(node);        
       }
     }
@@ -63,21 +70,25 @@ int main( int argc, char *argv[])
 
     // ===================================================================================
     int currentState = START;
-    int nextState = (currentState % (nStates)) + 1;
     bool userDefState = false;
     bool userDefTarget = false;
     int nStates = 6;
     bool rewardable = false;
     bool shouldReset = false;
     double tError = 0.03;
+    int nextState = (currentState % (nStates)) + 1;
 
     // Read in yaml file
+    vector<int> directions = {0, 1, 2};
+    vector<double> forces = {0.01, 0.02, 0.03, 0.04};
+    vector<int> widths = {1, 2, 3, 4};
+    vector<double> distances = {0.10, 0.15, 0.20};
 
     // Initialize targetList
     vector<TargetNode> targetList = initTargetList(directions, forces, widths, distances);
-    Iter targetIter = targetList.begin();
-    TargetNode currentTarget = *targetIter;
-    TargetNode nextTarget = NULL;
+    vector<TargetNode>::iterator targetIter = targetList.begin();
+    TargetNode currentTarget = targetIter;
+    TargetNode nextTarget = targetIter;
 
     // Run the experiment
     while(1)
@@ -118,9 +129,9 @@ int main( int argc, char *argv[])
               break;
             }
             // pull up next TARGET parameters
-            if ( nextTarget == NULL)
+            if ( *nextTarget == *currentTarget)
             {
-              currentTarget = targetIter++;
+              currentTarget = currentTarget.;
             } else {
               currentTarget = nextTarget;
             }

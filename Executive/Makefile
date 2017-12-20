@@ -1,5 +1,5 @@
 CPP = g++
-CPPFLAGS = -g -DUSE_LINUX -Wall -Wno-deprecated -pthread
+CPPFLAGS = -g -DUSE_LINUX -Wall -Wno-deprecated -pthread -std=c++0x
 
 LIB_DIR = /home/robot/dragonfly/lib
 INC_DIR = -I/home/robot/src/Dragonfly_Message_defs -I/home/robot/dragonfly/include
