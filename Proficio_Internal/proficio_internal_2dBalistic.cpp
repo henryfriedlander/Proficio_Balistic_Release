@@ -123,135 +123,132 @@ bool validate_args(int argc, char** argv) {
 }
 
 namespace barrett {
-namespace systems {
-v_type msg_tmp;
-barrett::systems::ExposedOutput<v_type> message;
+  namespace systems {
+    v_type msg_tmp;
+    barrett::systems::ExposedOutput<v_type> message;
 
-class BalisticForce : public HapticObject {
-	BARRETT_UNITS_FIXED_SIZE_TYPEDEFS;
+    class BalisticForce : public HapticObject {
+      BARRETT_UNITS_FIXED_SIZE_TYPEDEFS;
 
-public:
-	BalisticForce(const cp_type& center, 
-			const std::string& sysName = "BalisticForce") :
-		HapticObject(sysName),
-		c(center),
-		depth(0.0), dir(0.0) 
-	{}
-	virtual ~BalisticForce() { mandatoryCleanUp(); }
+    public:
+      BalisticForce(const cp_type& center, 
+          const std::string& sysName = "BalisticForce") :
+        HapticObject(sysName),
+        c(center),
+        depth(0.0), dir(0.0) 
+      {}
+      virtual ~BalisticForce() { mandatoryCleanUp(); }
 
-	const cp_type& getCenter() const { return c; }
+      const cp_type& getCenter() const { return c; }
 
-protected:
-	virtual void operate() {
-		pos = input.getValue();
-		for (int i=0;i<3;i++){
-			dir[i] = 0.0;
-		}
-		if (!thresholdMet or UpOrDown * pos[XorYorZ] > c[XorYorZ]){
-			cforce = c - pos;
-			if ((barrett::math::sign(forceThreshold)==1 && cforce[XorYorZ] >= forceThreshold) || (barrett::math::sign(forceThreshold)==-1 && cforce[XorYorZ] <= forceThreshold)){
-				thresholdMet = true;
-			}
-			
-			depth = cforce.norm();
-			dir[XorYorZ] = cforce[XorYorZ]; // / depth;
-		}else{
-			depth = 0.0;
-		}
-		for (int i=0;i<3;i++){
-			msg_tmp[i] = pos[i];
-		}
-		for (int i=3;i<6;i++){
-			msg_tmp[i]=0;
-		}
-		msg_tmp[XorYorZ+3] = UpOrDown * targetDistance;
-		
-		message.setValue(msg_tmp);
-		
-		depthOutputValue->setData(&depth);
-		directionOutputValue->setData(&dir);
-	}
+    protected:
+      virtual void operate() {
+        pos = input.getValue();
+        for (int i=0;i<3;i++){
+          dir[i] = 0.0;
+        }
+        if (!thresholdMet or UpOrDown * pos[XorYorZ] > c[XorYorZ]){
+          cforce = c - pos;
+          if ((barrett::math::sign(forceThreshold)==1 && cforce[XorYorZ] >= forceThreshold)
+            || (barrett::math::sign(forceThreshold)==-1 && cforce[XorYorZ]
+            <= forceThreshold))
+          {
+            thresholdMet = true;
+          }
+          
+          depth = cforce.norm();
+          dir[XorYorZ] = cforce[XorYorZ]; // / depth;
+        }else{
+          depth = 0.0;
+        }
+        for (int i=0;i<3;i++){
+          msg_tmp[i] = pos[i];
+        }
+        for (int i=3;i<6;i++){
+          msg_tmp[i]=0;
+        }
+        msg_tmp[XorYorZ+3] = UpOrDown * targetDistance;
+        
+        message.setValue(msg_tmp);
+        
+        depthOutputValue->setData(&depth);
+        directionOutputValue->setData(&dir);
+      }
 
-	cp_type c;
+      cp_type c;
 
-	// state & temporaries
+      // state & temporaries
 
-	double depth;
-	cf_type dir;
-	
+      double depth;
+      cf_type dir;
+      
 
-private:
-	DISALLOW_COPY_AND_ASSIGN(BalisticForce);
+    private:
+      DISALLOW_COPY_AND_ASSIGN(BalisticForce);
 
-public:
-	EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-};
-
-
-}
+    public:
+      EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+    };
+  }
 }
 
 namespace barrett {
-namespace systems {
+  namespace systems {
+    class HapticLine : public HapticObject {
+      BARRETT_UNITS_FIXED_SIZE_TYPEDEFS;
 
+    public:
+      HapticLine(const cp_type& center, 
+          const std::string& sysName = "HapticLine") :
+        HapticObject(sysName),
+        c(center),
+        depth(0.0), dir(0.0)
+      {}
+      virtual ~HapticLine() { mandatoryCleanUp(); }
 
-class HapticLine : public HapticObject {
-	BARRETT_UNITS_FIXED_SIZE_TYPEDEFS;
+      const cp_type& getCenter() const { return c; }
 
-public:
-	HapticLine(const cp_type& center, 
-			const std::string& sysName = "HapticLine") :
-		HapticObject(sysName),
-		c(center),
-		depth(0.0), dir(0.0)
-	{}
-	virtual ~HapticLine() { mandatoryCleanUp(); }
+    protected:
+      virtual void operate() {
+            p = input.getValue();
+        inputForce = c - p;
+        inputForce[XorYorZ] = 0;
+            if (0.2 + c[XorYorZ] < pos[XorYorZ]){
+                inputForce[XorYorZ] = 0.2 + c[XorYorZ] - p[XorYorZ];
+            }
+            if(-0.2 + c[XorYorZ] > pos[XorYorZ]){
+                inputForce[XorYorZ] = -0.2 + c[XorYorZ] - p[XorYorZ];
+            }
+        
+        depth = inputForce.norm();
+        dir = inputForce;
+        depthOutputValue->setData(&depth);
+        directionOutputValue->setData(&dir);
+      }
 
-	const cp_type& getCenter() const { return c; }
+      cp_type c;
+        cp_type p;
 
-protected:
-	virtual void operate() {
-        p = input.getValue();
-		inputForce = c - p;
-		inputForce[XorYorZ] = 0;
-        if (0.2 + c[XorYorZ] < pos[XorYorZ]){
-            inputForce[XorYorZ] = 0.2 + c[XorYorZ] - p[XorYorZ];
-        }
-        if(-0.2 + c[XorYorZ] > pos[XorYorZ]){
-            inputForce[XorYorZ] = -0.2 + c[XorYorZ] - p[XorYorZ];
-        }
-		
-		depth = inputForce.norm();
-		dir = inputForce;
-		depthOutputValue->setData(&depth);
-		directionOutputValue->setData(&dir);
-	}
+      // state & temporaries
+      cf_type inputForce;
 
-	cp_type c;
-    cp_type p;
+      double depth;
+      cf_type dir;
 
-	// state & temporaries
-	cf_type inputForce;
+    private:
+      DISALLOW_COPY_AND_ASSIGN(HapticLine);
 
-	double depth;
-	cf_type dir;
-
-private:
-	DISALLOW_COPY_AND_ASSIGN(HapticLine);
-
-public:
-	EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-};
-
-
-}
+    public:
+      EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+    };
+  }
 }
 
 
 
 namespace cube_sphere {
-/** When killed from outside (by GUI), this allows a graceful exit. */
-void exit_program_callback(int signum) { game_exit = true; }
+  /** When killed from outside (by GUI), this allows a graceful exit. */
+  void exit_program_callback(int signum) { game_exit = true; }
 }  // namespace cube_sphere
 
 cf_type scale(boost::tuple<cf_type, double> t) {
@@ -317,13 +314,17 @@ int proficio_main(int argc, char** argv,
 	scores.push_back(num);
   }
   forceThreshold *= UpOrDown;
-  std::string labels [4] = {"XorYorZ (0 -> x, 1 -> y, 2 -> z):                                 ",
-							"UpOrDown (-1 -> negative direction, 1 -> positive direction):     ",
-							"forceThreshold:                                                   ",
-							"targetDistance:                                                   "};
+  std::string labels [4] = {
+    "XorYorZ (0 -> x, 1 -> y, 2 -> z):                                 ",
+		"UpOrDown (-1 -> negative direction, 1 -> positive direction):     ",
+		"forceThreshold:                                                   ",
+		"targetDistance:                                                   "};
   
 
-  std::cout << "                          ** Trial 1 **                           "  << std::endl << "___________________________________________________________________"  << std::endl << std::endl;
+  std::cout << "                          ** Trial 1 **                        "
+    << std::endl << "__________________________________________________________"
+    << std::endl << std::endl;
+  
   //verify that the scores were stored correctly:
   for (size_t i = 0; i < scores.size(); ++i) {
       std::cout << labels[i] << scores[i] << std::endl;
@@ -509,8 +510,12 @@ int proficio_main(int argc, char** argv,
 			task_state_config_M.SetData( &task_state_data, sizeof(task_state_data));
 			mod.SendMessageDF( &task_state_config_M);
 			
-			std::cout << "                          ** Trial " << trialNumber << " **                           "  << std::endl << "___________________________________________________________________"  << std::endl << std::endl;
-			trialNumber++;
+			std::cout << "                          ** Trial " << trialNumber <<
+        " **                           "  << std::endl << 
+        "___________________________________________________________________"  
+        << std::endl << std::endl;
+			
+      trialNumber++;
 			
 			
 			if (XorYorZ == 2){ UpOrDown *= -1;}

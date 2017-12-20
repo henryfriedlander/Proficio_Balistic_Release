@@ -36,6 +36,7 @@
 #define PROFICIO_DEMOS_CUBE_SPHERE_H
 
 #include <stdexcept>
+#include <errno.h>
 
 #include <syslog.h>
 #include <unistd.h>     // for close()
@@ -84,6 +85,7 @@ class NetworkHaptics
     int err;
     long flags;
     int buflen;
+    char* errResp;
     unsigned int buflenlen;
     struct sockaddr_in bind_addr;
     struct sockaddr_in their_addr;
@@ -121,9 +123,18 @@ class NetworkHaptics
     buflenlen = sizeof(buflen);
     buflen = 11 * SIZE_OF_MSG_RECV;
     err = setsockopt(sock_, SOL_SOCKET, SO_SNDBUF, (char*)&buflen, buflenlen);
-    if (err) {
+    if (err)
+    {
       ctor_error_handler("Could not set output buffer size.", __func__);
 
+    }
+
+    /* Set reuse port */
+    int iSetOption = 1;
+    err = setsockopt(sock_, SOL_SOCKET, SO_REUSEADDR, (char*)&iSetOption, sizeof(iSetOption));
+    if (err)
+    {
+      ctor_error_handler("Could not set reuse.", __func__);
     }
 
     /* Set up the bind address */
@@ -131,20 +142,37 @@ class NetworkHaptics
     bind_addr.sin_port = htons(port_src);
     bind_addr.sin_addr.s_addr = htonl(INADDR_ANY);
     err = bind(sock_, (struct sockaddr*)&bind_addr, sizeof(bind_addr));
-    if (err == -1) {
+    if (err == -1)
+    {
+      // Determine Errno
+      errResp = "Unknown cause";
+      switch(errno)
+      {
+        case EACCES: errResp = "Protected address"; break;
+        case EADDRINUSE: errResp = "Address in use"; break;
+        case EBADF: errResp = "Sockfd not valid"; break;
+        case EINVAL: errResp = "Socket already bound"; break;
+        case ENOTSOCK: errResp = "Socket not socket"; break;
+        case EADDRNOTAVAIL: errResp = "Addr not local"; break;
+        case EFAULT: errResp = "Addr not accessible by user"; break;
+        case ELOOP: errResp = "Too many symbolic links"; break;
+        case ENAMETOOLONG: errResp = "Addr name too long"; break;
+        case ENOENT: errResp = "File doesnt exists"; break;
+        case ENOMEM: errResp = "Not enough kernel memory"; break;
+        case ENOTDIR: errResp = "Path prefix not directory"; break;
+        case EROFS: errResp = "Socket in read only file system"; break;
+      }
+      //(barrett::logMessage("(NetworkHaptics::NetworkHaptics): Ctor failed %s: Could not bind to socket on port %d") % __func__ % port_src).raise<std::runtime_error>();
       barrett::logMessage(
-          "(NetworkHaptics::NetworkHaptics): Constructor failed %s: "
-          "Could not bind to socket on port %d") %
-          __func__ % port_src;
-      throw std::runtime_error(
-          "(NetworkHaptics::NetworkHaptics): "
-          "Could not bind to socket on port.");
+        "(NetworkHaptics::NetworkHaptics): Ctor failed %s: Couldn't "
+        "bind to socket on port 5557: %s") % __func__ % errResp;
+      throw std::runtime_error( errResp );
     }
 
     /* Set up the other guy's address */
-    their_addr.sin_family = AF_INET;
-    their_addr.sin_port = htons(port_dest);
-    err = !inet_pton(AF_INET, remote_host, &their_addr.sin_addr);
+    their_addr.sin_family = AF_INET; // address family...
+    their_addr.sin_port = htons(port_dest); //unsigned short from host to network byte order
+    err = !inet_pton(AF_INET, remote_host, &their_addr.sin_addr); // convert IP to human readable address
     if (err) {
       barrett::logMessage(
           "(NetworkHaptics::NetworkHaptics): Constructor failed %s: "
@@ -175,7 +203,7 @@ class NetworkHaptics
    *  barrett::logMessage, and throwing a runtime error
    *
    *  @param failure_type   brief description of failure
-   *  @param func_name      name of the function where the failure occured
+   *  @param func_name      name of the function where the failure occurred
    */
   void ctor_error_handler(const std::string& failure_type,
                           const std::string& func_name) {

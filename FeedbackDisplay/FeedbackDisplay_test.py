@@ -2,7 +2,6 @@
 import sys
 import os
 import math
-# import winsound
 
 from cocos.actions import *
 from cocos.director import director
@@ -22,6 +21,16 @@ from argparse import ArgumentParser
 from PyDragonfly import Dragonfly_Module, CMessage, copy_to_msg, copy_from_msg, read_msg_data, MT_EXIT
 from dragonfly_utils import respond_to_ping
 import Dragonfly_config as rc
+
+try:
+    import winsound
+except ImportError:
+    import os
+    def playsound(frequency,duration): # Linux machines
+        os.system('beep -f %s -l %s' % (frequency,duration))
+else:
+    def playsound(frequency,duration): # Windows machines
+        winsound.Beep(frequency,duration)
 
 MAX_WIDTH = 1280
 OFFSET=20
